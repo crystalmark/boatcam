@@ -10,12 +10,30 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import json
 import sys
 import os
+import io
 
 class Position:
-    def __init__(self, latitude, longitude, timestamp):
-        self.latitude = latitude
-        self.longitude = longitude
-        self.timestamp = timestamp
+    def __init__(self):
+        self.latitude = "Unknown"
+        self.longitude = "Unknown"
+        self.timestamp = "Unknown"
+
+    def fix(self):
+        gpsd = gps(mode=WATCH_ENABLE|WATCH_NEWSTYLE)
+        time.sleep(1.0)
+        count = 0
+        while count < 120:
+            nx = gpsd.next()
+            # For a list of all supported classes and fields refer to:
+            # https://gpsd.gitlab.io/gpsd/gpsd_json.html
+            if nx['class'] == 'TPV':
+                self.latitude = getattr(nx,'lat', "Unknown")
+                self.longitude = getattr(nx,'lon', "Unknown")                
+                self.timestamp = getattr(nx,'time', "Unknown")
+                break
+            else:
+                count += 1
+                time.sleep(1.0)
 
     def latitudeRef(self):
         if self.latitude >= 0: 
@@ -35,50 +53,81 @@ class Position:
     def absLongitude(self):
         return [int(abs(self.longitude*10000000)), 10000000]
 
-def getPositionData(gps):
-    count = 0
-    while count < 120:
-        nx = gpsd.next()
-        # For a list of all supported classes and fields refer to:
-        # https://gpsd.gitlab.io/gpsd/gpsd_json.html
-        if nx['class'] == 'TPV':
-            latitude = getattr(nx,'lat', "Unknown")
-            longitude = getattr(nx,'lon', "Unknown")
-            current_time = getattr(nx,'time', "Unknown")
-            return Position(latitude, longitude, current_time)
+    def toString(self):
+        if self.latitude == "Unknown":
+            return "No fix"
         else:
-            count += 1
-            time.sleep(1.0)
-    return None
+            return str(self.absLatitude())+self.latitudeRef()+" "+str(self.absLongitude())+self.longitudeRef()
 
-def captureImage(picamera):
-    stream = io.BytesIO()
-    with picamera.PiCamera() as camera:
-        camera.start_preview()
-        time.sleep(2)
-        camera.capture(stream, format='jpeg')
-    # "Rewind" the stream to the beginning so we can read its content
-    stream.seek(0)
-    return Image.open(stream)   
+    def toJson(self):
+        return {
+                    'timestamp': self.timestamp,
+                    'latitude': self.latitude,
+                    'longitude': self.longitude
+                }
 
-def createExif(image, position):
-    exif_dict = piexif.load(image.info["exif"])
+class Capture:
+    def __init__(self, position, voltages, filename):
+        self.position = position
+        self.voltages = voltages
+        self.filename = filename
 
-    print (str(position.absLatitude())+position.latitudeRef()+" "+str(position.absLongitude())+position.longitudeRef())
+    def save(self):
+        capture = {
+            'position': position.toJson(),
+            'filename': filename,
+            'voltages': voltages
+        }
+        print(capture)
+        if not os.path.exists('capture.json'):
+            capture_json = []
+            with open('capture.json', 'w') as capture_file:
+                json.dump(capture_json, capture_file, indent=4)
+        with open('capture.json', 'r+') as capture_file:
+            capture_json = json.load(capture_file)
+            if capture_json == None:
+                capture_json = []
+            capture_json.append(capture)
+            capture_file.seek(0)
+            json.dump(capture_json, capture_file, indent=4)
 
-    exif_dict["GPS"][piexif.GPSIFD.GPSLatitudeRef] = position.latitudeRef()
-    exif_dict["GPS"][piexif.GPSIFD.GPSLatitude] = position.absLatitude()
-    exif_dict["GPS"][piexif.GPSIFD.GPSLongitudeRef] = position.longitudeRef()
-    exif_dict["GPS"][piexif.GPSIFD.GPSLongitude] = position.absLongitude()
-    return piexif.dump(exif_dict)
+class CaptureError:
+    def __init__(self, message):
+        self.message = message
 
-def save(image, exif_bytes, timestamp):
-    new_file = "cam"+timestamp+".jpg"
-    if exif_bytes != None:
-        image.save(new_file, "jpeg", exif=exif_bytes)
-    else:
-        image.save(new_file, "jpeg")
-    return new_file
+class BoatImage:
+    def click(self, position):
+        stream = io.BytesIO()
+        with picamera.PiCamera() as camera:
+            camera.start_preview()
+            time.sleep(2)
+            camera.capture(stream, format='jpeg')
+        # "Rewind" the stream to the beginning so we can read its content
+        stream.seek(0)
+        image = Image.open(stream)
+        if image == None:
+            raise CaptureError("Unable to find position")
+
+        exif_bytes = self.createExif(image, position)
+
+        return self.save(image, exif_bytes, position.timestamp)
+
+    def createExif(self, image, position):
+        exif_dict = piexif.load(image.info["exif"])
+
+        exif_dict["GPS"][piexif.GPSIFD.GPSLatitudeRef] = position.latitudeRef()
+        exif_dict["GPS"][piexif.GPSIFD.GPSLatitude] = position.absLatitude()
+        exif_dict["GPS"][piexif.GPSIFD.GPSLongitudeRef] = position.longitudeRef()
+        exif_dict["GPS"][piexif.GPSIFD.GPSLongitude] = position.absLongitude()
+        return piexif.dump(exif_dict)
+
+    def save(self, image, exif_bytes, timestamp):
+        new_file = "cam"+timestamp+".jpg"
+        if exif_bytes != None:
+            image.save(new_file, "jpeg", exif=exif_bytes)
+        else:
+            image.save(new_file, "jpeg")
+        return new_file
 
 def readVoltages():
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -94,40 +143,12 @@ def readVoltages():
                 "voltage2": voltage2
             }
 
-gpsd = gps(mode=WATCH_ENABLE|WATCH_NEWSTYLE)
-time.sleep(1.0)
+position = Position()
+position.fix()
 
-position = getPositionData(gpsd)
-if position != None:
-    print( "Your position: lon = " + str(position.longitude) + ", lat = " + str(position.latitude) )
+filename = BoatImage().click(position)
 
-    image = captureImage(picamera)
+voltages = readVoltages()
 
-    if image != None:
-
-        exif_bytes = createExif(image, position)
-        #exif_bytes = None
-        filename = save(image, exif_bytes, position.timestamp)
-        print(filename)
-
-        voltages = readVoltages()
-
-        capture = {
-            'timestamp': position.timestamp,
-            'latitude': position.latitude,
-            'longitude': position.longitude,
-            'filename': filename,
-            'voltages': voltages
-        }
-        if os.path.exists('capture.json'):
-            with open('capture.json', 'r') as capture_file:
-                capture_json = json.load(capture_file)
-        else:
-            capture_json = []
-        with open('capture.json', 'w') as capture_file:
-            capture_json.append(capture)
-            json.dump(capture_json, capture_file, indent=4)
-    else:
-        print( "Not able to capture image" )
-else:
-    print( "No GPS position available" )
+capture = Capture(position, voltages, filename)
+capture.save()
