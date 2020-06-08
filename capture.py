@@ -11,6 +11,7 @@ import json
 import sys
 import os
 import io
+from Gyro import Gyro
 
 class Position:
     def __init__(self):
@@ -54,10 +55,13 @@ class Position:
         return [int(abs(self.longitude*10000000)), 10000000]
 
     def toString(self):
-        if self.latitude == "Unknown":
+        if self.hasFix():
             return "No fix"
         else:
             return str(self.absLatitude())+self.latitudeRef()+" "+str(self.absLongitude())+self.longitudeRef()
+
+    def hasFix(self):
+        return self.latitude == "Unknown" or self.longitude == "Unknown"
 
     def toJson(self):
         return {
@@ -67,18 +71,20 @@ class Position:
                 }
 
 class Capture:
-    def __init__(self, position, voltages, filename):
+    def __init__(self, position, voltages, filename, x_angle):
         self.position = position
         self.voltages = voltages
         self.filename = filename
+        self.x_angle = x_angle
 
     def save(self):
         capture = {
-            'position': position.toJson(),
-            'filename': filename,
-            'voltages': voltages
+            'position': self.position.toJson(),
+            'filename': self.filename,
+            'voltages': self.voltages,
+            'x': str(self.x_angle)
         }
-        print(capture)
+
         if not os.path.exists('capture.json'):
             capture_json = []
             with open('capture.json', 'w') as capture_file:
@@ -108,7 +114,10 @@ class BoatImage:
         if image == None:
             raise CaptureError("Unable to find position")
 
-        exif_bytes = self.createExif(image, position)
+        if position.hasFix():
+            exif_bytes = self.createExif(image, position)
+        else:
+            exif_bytes = None
 
         return self.save(image, exif_bytes, position.timestamp)
 
@@ -150,5 +159,8 @@ filename = BoatImage().click(position)
 
 voltages = readVoltages()
 
-capture = Capture(position, voltages, filename)
+gyro = Gyro()
+x_angle = gyro.getXDegrees()
+
+capture = Capture(position, voltages, filename, x_angle)
 capture.save()

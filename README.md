@@ -6,12 +6,13 @@ Project to monitor the boat while I'm away.
 - Still photo
 - motor battery voltage
 - leisure battery voltage
+- title angle
 
 ## Planned capture
 - 360 photo
 - compass direction
-- tilt angle
 - gif timelapse
+- temperature
 
 ## Hardware used
 - Raspberry Pi Zero W 1.1
