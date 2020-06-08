@@ -12,6 +12,7 @@ import sys
 import os
 import io
 from Gyro import Gyro
+from Uploader import Uploader
 
 class Position:
     def __init__(self):
@@ -164,3 +165,6 @@ x_angle = gyro.getXDegrees()
 
 capture = Capture(position, voltages, filename, x_angle)
 capture.save()
+
+uploader = Uploader()
+uploader.upload()
