@@ -1,4 +1,4 @@
 #!/bin/sh
+cd ~/boatcam
 git pull
-pip3 install gps adafruit_ads1x15 adafruit-blinka
-python3 capture.py
+python3 capture.py $1 $2 $3

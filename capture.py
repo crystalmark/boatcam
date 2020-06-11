@@ -13,6 +13,9 @@ import os
 import io
 from Gyro import Gyro
 from Uploader import Uploader
+import boto3
+from paramiko import SSHClient
+from scp import SCPClient
 
 class Position:
     def __init__(self):
@@ -80,6 +83,7 @@ class Capture:
 
     def save(self):
         capture = {
+            'timestamp': self.position.timestamp,
             'position': self.position.toJson(),
             'filename': self.filename,
             'voltages': self.voltages,
@@ -98,6 +102,16 @@ class Capture:
             capture_file.seek(0)
             json.dump(capture_json, capture_file, indent=4)
 
+        ssh = SSHClient()
+        ssh.load_system_host_keys()
+        user_name=sys.argv[1]
+        web_server=sys.argv[2]
+        web_server_path=sys.argv[3]
+        # print (f"saving capture.json to {user_name}@{web_server}:{web_server_path}")
+        ssh.connect(web_server, username=user_name)
+        scp = SCPClient(ssh.get_transport())
+        scp.put('capture.json', f"{web_server_path}/capture.json" )
+
 class CaptureError:
     def __init__(self, message):
         self.message = message
@@ -106,6 +120,8 @@ class BoatImage:
     def click(self, position):
         stream = io.BytesIO()
         with picamera.PiCamera() as camera:
+            camera.resolution = (1960, 1080)
+            # camera.rotation = 180
             camera.start_preview()
             time.sleep(2)
             camera.capture(stream, format='jpeg')
