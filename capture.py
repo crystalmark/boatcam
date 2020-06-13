@@ -16,6 +16,7 @@ from Uploader import Uploader
 import boto3
 from paramiko import SSHClient
 from scp import SCPClient
+from datetime import datetime
 
 class Position:
     def __init__(self):
@@ -31,7 +32,7 @@ class Position:
             nx = gpsd.next()
             # For a list of all supported classes and fields refer to:
             # https://gpsd.gitlab.io/gpsd/gpsd_json.html
-            if nx['class'] == 'TPV':
+            if nx != None and nx['class'] == 'TPV':
                 self.latitude = getattr(nx,'lat', "Unknown")
                 self.longitude = getattr(nx,'lon', "Unknown")                
                 self.timestamp = getattr(nx,'time', "Unknown")
@@ -133,10 +134,9 @@ class BoatImage:
 
         if position.hasFix():
             exif_bytes = self.createExif(image, position)
+            return self.save(image, exif_bytes, position.timestamp)
         else:
-            exif_bytes = None
-
-        return self.save(image, exif_bytes, position.timestamp)
+            return self.save(image, None, datetime.today().isoformat())
 
     def createExif(self, image, position):
         exif_dict = piexif.load(image.info["exif"])
@@ -161,8 +161,8 @@ def readVoltages():
     chan1 = AnalogIn(ads, ADS.P0)
     chan2 = AnalogIn(ads, ADS.P1)
 
-    voltage1 = round((chan1.voltage*5),2)
-    voltage2 = round((chan2.voltage*5),2)
+    voltage1 = round((chan1.voltage*6.666),2)
+    voltage2 = round((chan2.voltage*6.666),2)
 
     return {
                 "voltage1": voltage1,
