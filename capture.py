@@ -122,7 +122,7 @@ class BoatImage:
         stream = io.BytesIO()
         with picamera.PiCamera() as camera:
             camera.resolution = (1960, 1080)
-            # camera.rotation = 180
+            camera.rotation = 180
             camera.start_preview()
             time.sleep(2)
             camera.capture(stream, format='jpeg')
@@ -161,8 +161,8 @@ def readVoltages():
     chan1 = AnalogIn(ads, ADS.P0)
     chan2 = AnalogIn(ads, ADS.P1)
 
-    voltage1 = round((chan1.voltage*6.666),2)
-    voltage2 = round((chan2.voltage*6.666),2)
+    voltage1 = round((chan1.voltage*4.9),2)
+    voltage2 = round((chan2.voltage*4.9),2)
 
     return {
                 "voltage1": voltage1,
