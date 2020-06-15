@@ -1,5 +1,6 @@
 #!/bin/sh
 cd ~/boatcam
+sudo pip3 install suntime
 git checkout .
 git pull
 rm -rf __pycache__
