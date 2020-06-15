@@ -10,10 +10,7 @@ until python3 capture.py $1 $2 $3 2>&1 >> capture.out
 do
 	scp capture.out *.log tim@crystalmark.co.uk:/var/www/crystalmark.co.uk/boatcam/
 	((i=i+1))
-	if [ $i -gt 10 ]
-	then
-		break;
-	fi
+	[[ i -eq 10 ]] && echo "Failed!" && exit 1
 	sleep 30
 	git pull
 	rm -rf __pycache__
