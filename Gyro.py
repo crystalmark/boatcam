@@ -20,6 +20,7 @@ ACCEL_ZOUT_H = 0x3F
 GYRO_XOUT_H  = 0x43
 GYRO_YOUT_H  = 0x45
 GYRO_ZOUT_H  = 0x47
+TEMP_OUT0 = 0x41
 DeviceAddress = 0x68   # MPU6050 device address
 
 #Read the gyro and acceleromater values from MPU6050
@@ -159,3 +160,7 @@ class Gyro():
 		print("There is a problem with the connection")
 		return None
 
+    def getTemperature(self):
+        raw_temp = self.read_raw_data(self.TEMP_OUT0)
+        actual_temp = (raw_temp / 340) + 36.53
+        return actual_temp
