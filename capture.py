@@ -17,7 +17,6 @@ import boto3
 from paramiko import SSHClient
 from scp import SCPClient
 from datetime import datetime
-import suntime
 
 class Position:
     def __init__(self):
@@ -124,7 +123,6 @@ class BoatImage:
         with picamera.PiCamera() as camera:
             camera.resolution = (1960, 1080)
             camera.rotation = 180
-            camera.exposure_mode = cameraMode(position.latitude, position.longitude)
             camera.start_preview()
             time.sleep(2)
             camera.capture(stream, format='jpeg')
@@ -139,17 +137,6 @@ class BoatImage:
             return self.save(image, exif_bytes, position.timestamp)
         else:
             return self.save(image, None, datetime.today().isoformat())
-
-    def cameraMode(self, latitude, longitude):
-        sun = Sun(round(latitude,2), round(longitude,2))
-        today_sr = sun.get_sunrise_time()
-        today_ss = sun.get_sunset_time()
-        timezone = today_sr.tzinfo
-        
-        if today_sr < datetime.datetime.now(timezone) < today_ss:
-            return "auto"
-        else:
-            return "night"
 
     def createExif(self, image, position):
         exif_dict = piexif.load(image.info["exif"])
