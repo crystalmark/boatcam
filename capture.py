@@ -76,12 +76,13 @@ class Position:
                 }
 
 class Capture:
-    def __init__(self, position, voltages, filename, x_angle, temperature):
+    # def __init__(self, position, voltages, filename, x_angle, temperature):
+    def __init__(self, position, voltages, filename, x_angle):
         self.position = position
         self.voltages = voltages
         self.filename = filename
         self.x_angle = x_angle
-        self.temperature = temperature
+        # self.temperature = temperature
 
     def save(self):
         capture = {
@@ -89,8 +90,9 @@ class Capture:
             'position': self.position.toJson(),
             'filename': self.filename,
             'voltages': self.voltages,
-            'x': str(self.x_angle),
-            'temperature': temperature
+            'x': str(self.x_angle)
+            # 'x': str(self.x_angle),
+            # 'temperature': temperature
         }
 
         if not os.path.exists('capture.json'):
@@ -183,6 +185,7 @@ x_angle = gyro.getXDegrees()
 # temperature = gyro.getTemperature()
 temperature = 0
 
+#capture = Capture(position, voltages, filename, x_angle, temperature)
 capture = Capture(position, voltages, filename, x_angle, temperature)
 capture.save()
 
