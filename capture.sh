@@ -1,5 +1,6 @@
 #!/bin/sh
 cd ~/boatcam
+rm capture.out
 git checkout .
 git pull 2>&1 > capture.out
 rm -rf __pycache__
