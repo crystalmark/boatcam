@@ -161,6 +161,7 @@ class Gyro():
 		return None
 
 	def getTemperature(self):
-		raw_temp = self.read_raw_data(TEMP_OUT0)
-		actual_temp = (raw_temp / 340) + 36.53
-		return actual_temp
+		return 0
+		# raw_temp = self.read_raw_data(TEMP_OUT0)
+		# actual_temp = (raw_temp / 340) + 36.53
+		# return actual_temp
