@@ -183,10 +183,9 @@ voltages = readVoltages()
 gyro = Gyro()
 x_angle = gyro.getXDegrees()
 # temperature = gyro.getTemperature()
-temperature = 0
 
 #capture = Capture(position, voltages, filename, x_angle, temperature)
-capture = Capture(position, voltages, filename, x_angle, temperature)
+capture = Capture(position, voltages, filename, x_angle)
 capture.save()
 
 uploader = Uploader()
