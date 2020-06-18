@@ -1,167 +1,157 @@
 from Kalman import KalmanAngle
-import smbus			#import SMBus module of I2C
+import smbus
 import time
 import math
 
 kalmanX = KalmanAngle()
 kalmanY = KalmanAngle()
 
-RestrictPitch = True	#Comment out to restrict roll to ±90deg instead - please read: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
+RestrictPitch = True  # Comment out to restrict roll to ±90deg instead - please read: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
 radToDeg = 57.2957786
-#some MPU6050 Registers and their Address
-PWR_MGMT_1   = 0x6B
-SMPLRT_DIV   = 0x19
-CONFIG	   = 0x1A
-GYRO_CONFIG  = 0x1B
-INT_ENABLE   = 0x38
+# some MPU6050 Registers and their Address
+PWR_MGMT_1 = 0x6B
+SMPLRT_DIV = 0x19
+CONFIG = 0x1A
+GYRO_CONFIG = 0x1B
+INT_ENABLE = 0x38
 ACCEL_XOUT_H = 0x3B
 ACCEL_YOUT_H = 0x3D
 ACCEL_ZOUT_H = 0x3F
-GYRO_XOUT_H  = 0x43
-GYRO_YOUT_H  = 0x45
-GYRO_ZOUT_H  = 0x47
+GYRO_XOUT_H = 0x43
+GYRO_YOUT_H = 0x45
+GYRO_ZOUT_H = 0x47
 TEMP_OUT0 = 0x41
-DeviceAddress = 0x68   # MPU6050 device address
+DeviceAddress = 0x68  # MPU6050 device address
 
-#Read the gyro and acceleromater values from MPU6050
-class Gyro():
-	def __init__(self):
-		self.bus = smbus.SMBus(1) 	# or bus = smbus.SMBus(0) for older version boards
 
-		#write to sample rate register
-		self.bus.write_byte_data(DeviceAddress, SMPLRT_DIV, 7)
+# Read the gyro and acceleromater values from MPU6050
+class Gyro:
+    def __init__(self):
+        try:
+            self.bus = smbus.SMBus(1)
+            self.bus.write_byte_data(DeviceAddress, SMPLRT_DIV, 7)
+            self.bus.write_byte_data(DeviceAddress, PWR_MGMT_1, 1)
+            self.bus.write_byte_data(DeviceAddress, CONFIG, int('0000110', 2))
+            self.bus.write_byte_data(DeviceAddress, GYRO_CONFIG, 24)
+            self.bus.write_byte_data(DeviceAddress, INT_ENABLE, 1)
 
-		#Write to power management register
-		self.bus.write_byte_data(DeviceAddress, PWR_MGMT_1, 1)
+            time.sleep(1)
+        except:
+            self.bus = None
+            print("No gyro connected")
 
-		#Write to Configuration register
-		#Setting DLPF (last three bit of 0X1A to 6 i.e '110' It removes the noise due to vibration.) https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
-		self.bus.write_byte_data(DeviceAddress, CONFIG, int('0000110',2))
+    def read_raw_data(self, addr):
+        high = self.bus.read_byte_data(DeviceAddress, addr)
+        low = self.bus.read_byte_data(DeviceAddress, addr + 1)
+        value = ((high << 8) | low)
+        if value > 32768:
+            value = value - 65536
+        return value
 
-		#Write to Gyro configuration register
-		self.bus.write_byte_data(DeviceAddress, GYRO_CONFIG, 24)
+    def get_x_degrees(self):
+        if self.bus is None:
+            return None
+        else:
+            kalAngleX = 0
+            kalAngleY = 0
 
-		#Write to interrupt enable register
-		self.bus.write_byte_data(DeviceAddress, INT_ENABLE, 1)
+            # Read Accelerometer raw value
+            accX = self.read_raw_data(ACCEL_XOUT_H)
+            accY = self.read_raw_data(ACCEL_YOUT_H)
+            accZ = self.read_raw_data(ACCEL_ZOUT_H)
 
-		time.sleep(1)
+            # print(accX,accY,accZ)
+            # print(math.sqrt((accY**2)+(accZ**2)))
+            if (RestrictPitch):
+                roll = math.atan2(accY, accZ) * radToDeg
+                pitch = math.atan(-accX / math.sqrt((accY ** 2) + (accZ ** 2))) * radToDeg
+            else:
+                roll = math.atan(accY / math.sqrt((accX ** 2) + (accZ ** 2))) * radToDeg
+                pitch = math.atan2(-accX, accZ) * radToDeg
 
-	def read_raw_data(self, addr):
-		#Accelero and Gyro value are 16-bit
-		high = self.bus.read_byte_data(DeviceAddress, addr)
-		low = self.bus.read_byte_data(DeviceAddress, addr+1)
+            kalmanX.setAngle(roll)
+            kalmanY.setAngle(pitch)
+            gyroXAngle = roll;
+            gyroYAngle = pitch;
+            compAngleX = roll;
+            compAngleY = pitch;
 
-		#concatenate higher and lower value
-		value = ((high << 8) | low)
+            timer = time.time()
+            flag = 0
+            while flag < 100:
+                try:
+                    # Read Accelerometer raw value
+                    accX = self.read_raw_data(ACCEL_XOUT_H)
+                    accY = self.read_raw_data(ACCEL_YOUT_H)
+                    accZ = self.read_raw_data(ACCEL_ZOUT_H)
 
-		#to get signed value from mpu6050
-		if(value > 32768):
-			value = value - 65536
-		return value
+                    # Read Gyroscope raw value
+                    gyroX = self.read_raw_data(GYRO_XOUT_H)
+                    gyroY = self.read_raw_data(GYRO_YOUT_H)
+                    gyroZ = self.read_raw_data(GYRO_ZOUT_H)
 
-	def getXDegrees(self):
-		kalAngleX = 0
-		kalAngleY = 0
+                    dt = time.time() - timer
+                    timer = time.time()
 
-		#Read Accelerometer raw value
-		accX = self.read_raw_data(ACCEL_XOUT_H)
-		accY = self.read_raw_data(ACCEL_YOUT_H)
-		accZ = self.read_raw_data(ACCEL_ZOUT_H)
+                    if (RestrictPitch):
+                        roll = math.atan2(accY, accZ) * radToDeg
+                        pitch = math.atan(-accX / math.sqrt((accY ** 2) + (accZ ** 2))) * radToDeg
+                    else:
+                        roll = math.atan(accY / math.sqrt((accX ** 2) + (accZ ** 2))) * radToDeg
+                        pitch = math.atan2(-accX, accZ) * radToDeg
 
-		#print(accX,accY,accZ)
-		#print(math.sqrt((accY**2)+(accZ**2)))
-		if (RestrictPitch):
-			roll = math.atan2(accY,accZ) * radToDeg
-			pitch = math.atan(-accX/math.sqrt((accY**2)+(accZ**2))) * radToDeg
-		else:
-			roll = math.atan(accY/math.sqrt((accX**2)+(accZ**2))) * radToDeg
-			pitch = math.atan2(-accX,accZ) * radToDeg
+                    gyroXRate = gyroX / 131
+                    gyroYRate = gyroY / 131
 
-		kalmanX.setAngle(roll)
-		kalmanY.setAngle(pitch)
-		gyroXAngle = roll;
-		gyroYAngle = pitch;
-		compAngleX = roll;
-		compAngleY = pitch;
+                    if RestrictPitch:
 
-		timer = time.time()
-		flag = 0
-		while flag < 100: 
-			try:
-				#Read Accelerometer raw value
-				accX = self.read_raw_data(ACCEL_XOUT_H)
-				accY = self.read_raw_data(ACCEL_YOUT_H)
-				accZ = self.read_raw_data(ACCEL_ZOUT_H)
+                        if (roll < -90 and kalAngleX > 90) or (roll > 90 and kalAngleX < -90):
+                            kalmanX.setAngle(roll)
+                            complAngleX = roll
+                            kalAngleX = roll
+                            gyroXAngle = roll
+                        else:
+                            kalAngleX = kalmanX.getAngle(roll, gyroXRate, dt)
+                        if abs(kalAngleX) > 90:
+                            gyroYRate = -gyroYRate
+                            kalAngleY = kalmanY.getAngle(pitch, gyroYRate, dt)
+                    else:
 
-				#Read Gyroscope raw value
-				gyroX = self.read_raw_data(GYRO_XOUT_H)
-				gyroY = self.read_raw_data(GYRO_YOUT_H)
-				gyroZ = self.read_raw_data(GYRO_ZOUT_H)
+                        if (pitch < -90 and kalAngleY > 90) or (pitch > 90 and kalAngleY < -90):
+                            kalmanY.setAngle(pitch)
+                            complAngleY = pitch
+                            kalAngleY = pitch
+                            gyroYAngle = pitch
+                        else:
+                            kalAngleY = kalmanY.getAngle(pitch, gyroYRate, dt)
 
-				dt = time.time() - timer
-				timer = time.time()
+                        if (abs(kalAngleY) > 90):
+                            gyroXRate = -gyroXRate
+                            kalAngleX = kalmanX.getAngle(roll, gyroXRate, dt)
 
-				if (RestrictPitch):
-					roll = math.atan2(accY,accZ) * radToDeg
-					pitch = math.atan(-accX/math.sqrt((accY**2)+(accZ**2))) * radToDeg
-				else:
-					roll = math.atan(accY/math.sqrt((accX**2)+(accZ**2))) * radToDeg
-					pitch = math.atan2(-accX,accZ) * radToDeg
+                    gyroXAngle = gyroXRate * dt
+                    gyroYAngle = gyroYAngle * dt
 
-				gyroXRate = gyroX/131
-				gyroYRate = gyroY/131
+                    compAngleX = 0.93 * (compAngleX + gyroXRate * dt) + 0.07 * roll
+                    compAngleY = 0.93 * (compAngleY + gyroYRate * dt) + 0.07 * pitch
 
-				if (RestrictPitch):
+                    if (gyroXAngle < -180) or (gyroXAngle > 180):
+                        gyroXAngle = kalAngleX
+                    if (gyroYAngle < -180) or (gyroYAngle > 180):
+                        gyroYAngle = kalAngleY
 
-					if ((roll < -90 and kalAngleX >90) or (roll > 90 and kalAngleX < -90)):
-						kalmanX.setAngle(roll)
-						complAngleX = roll
-						kalAngleX = roll
-						gyroXAngle = roll
-					else:
-						kalAngleX = kalmanX.getAngle(roll,gyroXRate,dt)
-					if abs(kalAngleX)>90:
-						gyroYRate = -gyroYRate
-						kalAngleY = kalmanY.getAngle(pitch,gyroYRate,dt)
-				else:
+                    return round(kalAngleX, 2);
 
-					if ((pitch < -90 and kalAngleY >90) or (pitch > 90 and kalAngleY < -90)):
-						kalmanY.setAngle(pitch)
-						complAngleY = pitch
-						kalAngleY = pitch
-						gyroYAngle = pitch
-					else:
-						kalAngleY = kalmanY.getAngle(pitch,gyroYRate,dt)
+                except Exception as exc:
+                    print(exc)
+                    flag += 1
+            print("There is a problem with the connection")
+            return None
 
-					if(abs(kalAngleY)>90):
-						gyroXRate = -gyroXRate
-						kalAngleX = kalmanX.getAngle(roll,gyroXRate,dt)
-
-				#angle = (rate of change of angle) * change in time
-				gyroXAngle = gyroXRate * dt
-				gyroYAngle = gyroYAngle * dt
-
-				#compAngle = constant * (old_compAngle + angle_obtained_from_gyro) + constant * angle_obtained from accelerometer
-				compAngleX = 0.93 * (compAngleX + gyroXRate * dt) + 0.07 * roll
-				compAngleY = 0.93 * (compAngleY + gyroYRate * dt) + 0.07 * pitch
-
-				if ((gyroXAngle < -180) or (gyroXAngle > 180)):
-					gyroXAngle = kalAngleX
-				if ((gyroYAngle < -180) or (gyroYAngle > 180)):
-					gyroYAngle = kalAngleY
-
-				#print("Angle X: " + str(kalAngleX)+"   " +"Angle Y: " + str(kalAngleY))
-				#print(str(roll)+"  "+str(gyroXAngle)+"  "+str(compAngleX)+"  "+str(kalAngleX)+"  "+str(pitch)+"  "+str(gyroYAngle)+"  "+str(compAngleY)+"  "+str(kalAngleY))
-				return round(kalAngleX,2);
-
-			except Exception as exc:
-				print(exc)
-				flag += 1
-		print("There is a problem with the connection")
-		return None
-
-	def getTemperature(self):
-		return 0
-		# raw_temp = self.read_raw_data(TEMP_OUT0)
-		# actual_temp = (raw_temp / 340) + 36.53
-		# return actual_temp
+    def get_temperature(self):
+        if self.bus is None:
+            return None
+        else:
+            raw_temp = self.read_raw_data(TEMP_OUT0)
+            actual_temp = (raw_temp / 340) + 36.53
+            return round(actual_temp, 1)

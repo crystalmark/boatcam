@@ -1,20 +1,18 @@
-#!/bin/sh
+#!/bin/bash
+bucket=$1
 cd ~/boatcam
-rm capture.out
-git checkout .
-git pull 2>&1 > capture.out
+[ ! -f test ] && git checkout .
+[ ! -f test ] && git pull 2>&1
 rm -rf __pycache__
 sudo service gpsd restart
 sleep 2
 i=0
-until python3 capture.py $1 $2 $3 2>&1 >> capture.out
-do
-	echo "Failed to execute capture $?" >> capture.out
-	scp capture.out tim@crystalmark.co.uk:/var/www/crystalmark.co.uk/boatcam/
-	((i=i+1))
-	[[ i -eq 10 ]] && echo "Failed!" && break
-	sleep 30
-	git pull 2>&1 >> capture.out
-	rm -rf __pycache__
+until python3 capture.py $bucket 2>&1 ; do
+  ((i = i + 1))
+  [[ i -ge 10 ]] && echo "Failed!" && break
+  sleep 30
+  [ ! -f test ] && git pull 2>&1
+  [ ! -f test ] && rm -rf __pycache__
 done
-scp /var/mail/pi tim@crystalmark.co.uk:/var/www/crystalmark.co.uk/boatcam/
+[ ! -f test ] && aws s3 cp /var/mail/pi "s3://$bucket/pi_mail"
+[ ! -f test ] && cat /dev/null > /var/mail/pi
