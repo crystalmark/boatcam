@@ -23,9 +23,12 @@ temperature = gyro.get_temperature()
 tide = Tide()
 tide_height = tide.current_height()
 
+bucket_name = sys.argv[1]
+uploader = Uploader(bucket_name)
+
+uploader.download_json()
+
 state = State(position, voltages, filename, x_angle, temperature, tide_height)
 state.save()
 
-bucket_name = sys.argv[1]
-uploader = Uploader(bucket_name)
 uploader.upload()
