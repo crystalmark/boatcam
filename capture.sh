@@ -1,5 +1,5 @@
 #!/bin/bash
-bucket=boatcamtest
+bucket=$1
 cd ~/boatcam
 [ ! -f test ] && git checkout .
 [ ! -f test ] && git pull 2>&1
