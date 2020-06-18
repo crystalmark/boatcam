@@ -9,7 +9,7 @@ sleep 2
 i=0
 until python3 capture.py $bucket 2>&1 ; do
   ((i = i + 1))
-  [[ i -ge 10 ]] && echo "Failed!" && break
+  [[ i -ge 3 ]] && echo "Failed!" && break
   sleep 30
   [ ! -f test ] && git pull 2>&1
   [ ! -f test ] && rm -rf __pycache__
