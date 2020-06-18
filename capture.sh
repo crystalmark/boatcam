@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "0 * * * *	~/boatcam/capture.sh" | crontab -
 cd ~/boatcam
 [ ! -f test ] && git checkout .
 [ ! -f test ] && git pull 2>&1
