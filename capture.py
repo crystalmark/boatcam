@@ -6,12 +6,7 @@ from Position import Position
 from BoatImage import BoatImage
 from Voltage import Voltages
 from Tide import Tide
-import os
 
-try:
-    os.system('echo "0 * * * *	~/boatcam/capture.sh boatcam" | crontab -')
-except:
-    print('failed to update crontab')
 
 position = Position()
 position.fix()
