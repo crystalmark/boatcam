@@ -30,11 +30,16 @@ class Uploader:
             self.upload_file(file_name)
             os.remove(file_name)
 
+    def upload_image(self, file_name):
+        self.upload_file(file_name)
+        os.remove(file_name)
+
     def upload_json(self):
         self.upload_file("capture.json")
 
     def download_json(self):
         try:
             self.s3_client.download_file(self.bucket_name, "capture.json", "capture.json")
-        except:
+        except Exception as e:
             print("unable to download capture.json from s3")
+            print(e)

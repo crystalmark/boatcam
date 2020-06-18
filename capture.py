@@ -8,11 +8,14 @@ from Voltage import Voltages
 from Tide import Tide
 import os
 
+bucket_name = sys.argv[1]
+
 try:
     os.system('crontab -r')
-    os.system('echo "0 * * * *	~/boatcam/capture.sh boatcam" | crontab -')
-except:
+    os.system(f"echo '0 * * * *	~/boatcam/capture.sh {bucket_name}' | crontab -")
+except Exception as e:
     print('failed to update crontab')
+    print(e)
 
 position = Position()
 position.fix()
@@ -29,7 +32,6 @@ temperature = gyro.get_temperature()
 tide = Tide()
 tide_height = tide.current_height()
 
-bucket_name = sys.argv[1]
 uploader = Uploader(bucket_name)
 
 uploader.download_json()
@@ -37,4 +39,5 @@ uploader.download_json()
 state = State(position, voltages, filename, x_angle, temperature, tide_height)
 state.save()
 
-uploader.upload()
+uploader.upload_image(filename)
+uploader.upload_json()
