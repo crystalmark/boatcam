@@ -1,5 +1,5 @@
 #!/bin/bash
-bucket=$1
+bucket=boatcam
 cd ~/boatcam
 rm -f ./*.jpg
 [ ! -f test ] && git checkout .
