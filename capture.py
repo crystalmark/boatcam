@@ -6,6 +6,7 @@ from Position import Position
 from BoatImage import BoatImage
 from Voltage import Voltages
 from Tide import Tide
+from Disk import Disk
 import os
 
 bucket_name = sys.argv[1]
@@ -36,7 +37,9 @@ uploader = Uploader(bucket_name)
 
 uploader.download_json()
 
-state = State(position, voltages, filename, x_angle, temperature, tide_height)
+disk_usage = Disk.current_usage()
+
+state = State(position, voltages, filename, x_angle, temperature, tide_height, disk_usage)
 state.save()
 
 uploader.upload_image(filename)
