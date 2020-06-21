@@ -9,7 +9,8 @@ from State import State
 from Position import Position
 from BoatImage import BoatImage
 
-VOLTAGE_RATIO = 4.9
+VOLTAGE_RATIO_ENGINE = 4.9
+VOLTAGE_RATIO_LEISURE = 9
 
 
 class Voltages:
@@ -27,8 +28,8 @@ class Voltages:
     def read_voltages(self):
 
         if self.chan1 is not None:
-            voltage1 = round((self.chan1.voltage * VOLTAGE_RATIO), 2)
-            voltage2 = round((self.chan2.voltage * VOLTAGE_RATIO), 2)
+            voltage1 = round((self.chan1.voltage * VOLTAGE_RATIO_LEISURE), 2)
+            voltage2 = round((self.chan2.voltage * VOLTAGE_RATIO_ENGINE), 2)
         else:
             voltage1 = None
             voltage2 = None
