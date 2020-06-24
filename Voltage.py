@@ -10,7 +10,7 @@ from Position import Position
 from BoatImage import BoatImage
 
 VOLTAGE_RATIO_ENGINE = 4.9
-VOLTAGE_RATIO_LEISURE = 4.9
+VOLTAGE_RATIO_LEISURE = 5.8
 
 
 class Voltages:
