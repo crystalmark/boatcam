@@ -1,4 +1,8 @@
 #!/bin/bash
+case $(date +%H:%M) in
+    (14:*)        sudo reboot;;
+esac
+sudo iw wlan0 set power_save on
 bucket=boatcam
 cd ~/boatcam
 rm -f ./*.jpg
