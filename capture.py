@@ -42,5 +42,6 @@ disk_usage = Disk.current_usage()
 state = State(position, voltages, filename, x_angle, temperature, tide_height, disk_usage)
 state.save()
 
-uploader.upload_image(filename)
 uploader.upload_json()
+if filename is not None:
+    uploader.upload_image(filename)

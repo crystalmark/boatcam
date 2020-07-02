@@ -13,25 +13,28 @@ class CaptureError:
 
 class BoatImage:
     def click(self, position):
-        stream = io.BytesIO()
-        with picamera.PiCamera() as camera:
-            # camera.resolution = (1960, 1080)
-            camera.resolution = (1280, 720)
-            camera.rotation = 180
-            camera.start_preview()
-            time.sleep(2)
-            camera.capture(stream, format='jpeg')
-        # "Rewind" the stream to the beginning so we can read its content
-        stream.seek(0)
-        image = Image.open(stream)
-        if image is None:
-            raise CaptureError("Unable to find position")
+        try:
+            stream = io.BytesIO()
+            with picamera.PiCamera() as camera:
+                # camera.resolution = (1960, 1080)
+                camera.resolution = (1280, 720)
+                camera.rotation = 180
+                camera.start_preview()
+                time.sleep(2)
+                camera.capture(stream, format='jpeg')
+            # "Rewind" the stream to the beginning so we can read its content
+            stream.seek(0)
+            image = Image.open(stream)
+            if image is None:
+                raise CaptureError("Unable to find position")
 
-        if position.has_fix():
-            exif_bytes = self.create_exif(image, position)
-            return self.save(image, exif_bytes, position.timestamp)
-        else:
-            return self.save(image, None, datetime.today().isoformat())
+            if position.has_fix():
+                exif_bytes = self.create_exif(image, position)
+                return self.save(image, exif_bytes, position.timestamp)
+            else:
+                return self.save(image, None, datetime.today().isoformat())
+        except:
+            return None
 
     @staticmethod
     def create_exif(image, position):
