@@ -2,7 +2,7 @@
 case $(date +%H:%M) in
     (14:*)        sudo reboot;;
 esac
-sudo iw wlan0 set power_save on
+sudo iw wlan0 set power_save off
 bucket=boatcam
 cd ~/boatcam
 rm -f ./*.jpg
