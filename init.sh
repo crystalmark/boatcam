@@ -35,6 +35,8 @@ else
   echo 'File raspi-blacklist.conf does not exist, skip this step.'
 fi
 
+apt-get update
+
 # install i2c-tools
 echo '>>> Install i2c-tools'
 if hash i2cget 2>/dev/null; then
@@ -49,3 +51,23 @@ apt-get install -y python3 python3-pip
 
 runuser -l 'pi' -c 'git clone https://github.com/crystalmark/boatcam.git'
 runuser -l 'pi' -c 'cd boatcam; git checkout prototype1'
+
+pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219
+
+apt-get install -y libjpeg-dev
+
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade Pillow
+
+apt-get install -y gpsd
+
+wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
+
+echo "0 * * * * ~/boatcam/capture.py boatcamtest > /dev/null 2>&1" | crontab -
+
+hostname boatcam.local
+
+#generate a guid and save to ~/.serialnumber
+#save API key to ~/.apikey
+
+#reboot
