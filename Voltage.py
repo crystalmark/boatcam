@@ -26,7 +26,7 @@ class Voltages:
 
         if self.chan1 is not None:
             voltage1 = round(self.chan1.shunt_voltage, 2)
-            voltage1 = round(self.chan2.shunt_voltage, 2)
+            voltage2 = round(self.chan2.shunt_voltage, 2)
         else:
             voltage1 = None
             voltage2 = None
