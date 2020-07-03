@@ -1,9 +1,5 @@
 #!/bin/bash
-case $(date +%H:%M) in
-    (14:*)        sudo reboot;;
-esac
-sudo iw wlan0 set power_save off
-bucket=boatcam
+bucket=$1
 cd ~/boatcam
 rm -f ./*.jpg
 [ ! -f test ] && git checkout .
