@@ -17,7 +17,7 @@ class BoatImage:
             stream = io.BytesIO()
             with picamera.PiCamera() as camera:
                 # camera.resolution = (1960, 1080)
-                camera.resolution = (1280, 720)
+                # camera.resolution = (1280, 720)
                 camera.rotation = 180
                 camera.start_preview()
                 time.sleep(2)

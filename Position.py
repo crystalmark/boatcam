@@ -51,7 +51,7 @@ class Position:
                 self.abs_longitude()) + self.longitude_ref()
 
     def has_fix(self):
-        return self.latitude == "Unknown" or self.longitude == "Unknown"
+        return self.latitude is not None and self.longitude is not None and self.latitude != "Unknown" and self.longitude != "Unknown"
 
     def to_json(self):
         return {
