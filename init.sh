@@ -63,11 +63,18 @@ apt-get install -y gpsd
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
 
-echo "0 * * * * ~/boatcam/capture.py boatcamtest > /dev/null 2>&1" | crontab -
+runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.py boatcamtest > /dev/null 2>&1" | crontab -'
 
 hostname boatcam.local
 
 #generate a guid and save to ~/.serialnumber
-#save API key to ~/.apikey
+cat /proc/sys/kernel/random/uuid >> ~/.serialnumber
 
-#reboot
+#save API key to ~/.apikey
+echo $1 >> ~/.apikey
+
+echo "start_x=1" >> /boot/config.txt
+echo "gpu_mem=128" >> /boot/config.txt
+echo "disable_camera_led=1" >> /boot/config.txt
+
+reboot
