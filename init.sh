@@ -63,7 +63,9 @@ apt-get install -y gpsd
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
 
-runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.py boatcamtest > /dev/null 2>&1" | crontab -'
+pip3 install adafruit-circuitpython-lsm9ds1
+
+runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam > /dev/null 2>&1" | crontab -'
 
 hostname boatcam.local
 

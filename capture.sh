@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo pip3 install adafruit-circuitpython-lsm9ds1
 bucket=$1
 cd ~/boatcam
 rm -f ./*.jpg
