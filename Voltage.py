@@ -37,19 +37,19 @@ class Voltages:
     def read_voltages(self):
 
         if self.chan1 is not None:
-            voltage1 = round(self.chan1.bus_voltage1, 2)
+            voltage1 = round(self.chan1.bus_voltage, 2)
         else:
             voltage1 = None
         if self.chan2 is not None:
-            voltage2 = round(self.chan2.bus_voltage1, 2)
+            voltage2 = round(self.chan2.bus_voltage, 2)
         else:
             voltage2 = None
         if self.chan3 is not None:
-            voltage3 = round(self.chan3.bus_voltage1, 2)
+            voltage3 = round(self.chan3.bus_voltage, 2)
         else:
             voltage3 = None
         if self.chan4 is not None:
-            voltage4 = round(self.chan4.bus_voltage1, 2)
+            voltage4 = round(self.chan4.bus_voltage, 2)
         else:
             voltage4 = None
 
