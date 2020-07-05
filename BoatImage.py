@@ -33,7 +33,9 @@ class BoatImage:
                 return self.save(image, exif_bytes, position.timestamp)
             else:
                 return self.save(image, None, datetime.today().isoformat())
-        except:
+        except Exception as e:
+            print("Unable to capture image from camera")
+            print(e)
             return None
 
     @staticmethod
