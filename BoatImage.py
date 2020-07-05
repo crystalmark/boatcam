@@ -18,7 +18,7 @@ class BoatImage:
             with picamera.PiCamera() as camera:
                 # camera.resolution = (1960, 1080)
                 # camera.resolution = (1280, 720)
-                camera.rotation = 180
+                camera.rotation = 90
                 camera.start_preview()
                 time.sleep(2)
                 camera.capture(stream, format='jpeg')
