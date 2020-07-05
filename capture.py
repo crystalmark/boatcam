@@ -7,16 +7,8 @@ from BoatImage import BoatImage
 from Voltage import Voltages
 from Tide import Tide
 from Disk import Disk
-import os
 
 bucket_name = sys.argv[1]
-
-try:
-    os.system('crontab -r')
-    os.system(f"echo '0 * * * *	~/boatcam/capture.sh {bucket_name}' | crontab -")
-except Exception as e:
-    print('failed to update crontab')
-    print(e)
 
 position = Position()
 position.fix()
