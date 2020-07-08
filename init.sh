@@ -52,7 +52,7 @@ apt-get install -y python3 python3-pip
 runuser -l 'pi' -c 'git clone https://github.com/crystalmark/boatcam.git'
 runuser -l 'pi' -c 'cd boatcam; git checkout prototype1'
 
-pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219
+pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1
 
 apt-get install -y libjpeg-dev
 
@@ -63,20 +63,21 @@ apt-get install -y gpsd
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
 
-pip3 install adafruit-circuitpython-lsm9ds1
-
 runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam > /dev/null 2>&1" | crontab -'
 
 hostname boatcam.local
 
-#generate a guid and save to ~/.serialnumber
-cat /proc/sys/kernel/random/uuid >> ~/.serialnumber
+#generate a uuid and save to ~/.serialnumber
+serialnumber=`/proc/sys/kernel/random/uuid`
+echo $serialnumber >> ~pi/.serialnumber
 
-#save API key to ~/.apikey
-echo $1 >> ~/.apikey
+API_KEY=$(curl -s --header "Content-Type: application/json" --header "x-api-key: $1"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber)
 
+echo $API_KEY >> ~pi/.apikey
+
+# enable camera
 echo "start_x=1" >> /boot/config.txt
 echo "gpu_mem=128" >> /boot/config.txt
 echo "disable_camera_led=1" >> /boot/config.txt
 
-reboot
+
