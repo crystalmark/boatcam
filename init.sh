@@ -50,7 +50,7 @@ apt-get install -y git
 apt-get install -y python3 python3-pip
 
 runuser -l 'pi' -c 'git clone https://github.com/crystalmark/boatcam.git'
-runuser -l 'pi' -c 'cd boatcam; git checkout prototype1'
+runuser -l 'pi' -c 'cd boatcam; git checkout prototype2'
 
 pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1
 
@@ -69,9 +69,11 @@ serialnumber="$(cut -d'-' -f5 <<<"$uid")"
 echo $serialnumber >> ~pi/.serialnumber
 echo "Serial Number: $serialnumber"
 
-curl -s --header "Content-Type: application/json" --header "x-api-key: $1"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber
-
+API_KEY=$1
 echo $API_KEY >> ~pi/.apikey
+
+curl -s --header "Content-Type: application/json" --header "x-api-key: $API_KEY"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber
+
 
 runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam $API_KEY > /dev/null 2>&1" | crontab -'
 

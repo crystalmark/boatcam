@@ -1,22 +1,25 @@
 import logging
-import boto3
-from botocore.exceptions import ClientError
 import glob
 import os
+import requests
 
+IMAGE_URL = 'https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/'
+HEADERS = {'Content-Type' : 'image/jpeg', 'x-api-key': 'kOcaoHBuT56svD7oyvEMm11PiFnQdN3L3oGFB8HL'}
 
 class Uploader:
-    def __init__(self, bucket_name):
-        self.s3_client = boto3.client('s3')
+    def __init__(self, bucket_name, serialnumber):
         if bucket_name is not None:
             self.bucket_name = bucket_name
         else:
             self.bucket_name = 'boatcam'
+        self.serialnumber = serialnumber
 
-    def upload_file(self, file_name):
+    def upload_image(self, file_name):
         try:
+            files = {'media': open(file_name, 'rb')}
             self.s3_client.upload_file(file_name, self.bucket_name, file_name)
-        except ClientError as e:
+            requests.post(IMAGE_URL+self.serialnumber+'/images', headers=HEADERS, files=files)
+        except requests.exceptions.RequestException as e:
             logging.error(e)
             return False
         return True
@@ -30,16 +33,5 @@ class Uploader:
             self.upload_file(file_name)
             os.remove(file_name)
 
-    def upload_image(self, file_name):
-        self.upload_file(file_name)
-        os.remove(file_name)
-
     def upload_json(self):
         self.upload_file("capture.json")
-
-    def download_json(self):
-        try:
-            self.s3_client.download_file(self.bucket_name, "capture.json", "capture.json")
-        except Exception as e:
-            print("unable to download capture.json from s3")
-            print(e)

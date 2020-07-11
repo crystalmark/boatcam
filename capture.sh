@@ -1,13 +1,13 @@
 #!/bin/bash
-sudo pip3 install adafruit-circuitpython-lsm9ds1
 bucket=$1
+serialnumber=6b76c6b2-f05b-4ecf-a600-0fc87d3fdcd1
 cd ~/boatcam
 rm -f ./*.jpg
 [ ! -f test ] && git checkout .
 [ ! -f test ] && git pull 2>&1
 rm -rf __pycache__
 i=0
-until python3 capture.py $bucket 2>&1 ; do
+until python3 capture.py $bucket $serialnumber 2>&1 ; do
   ((i = i + 1))
   [[ i -ge 3 ]] && echo "Failed!" && break
   sleep 30

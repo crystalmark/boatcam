@@ -9,6 +9,7 @@ from Tide import Tide
 from Disk import Disk
 
 bucket_name = sys.argv[1]
+serialnumber = sys.argv[2]
 
 position = Position()
 position.fix()
@@ -25,7 +26,7 @@ temperature = gyro.get_temperature()
 tide = Tide()
 tide_height = tide.current_height()
 
-uploader = Uploader(bucket_name)
+uploader = Uploader(bucket_name, serialnumber)
 
 uploader.download_json()
 
