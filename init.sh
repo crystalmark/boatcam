@@ -64,7 +64,7 @@ apt-get install -y gpsd
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
 
 #generate a uuid and save to ~/.serialnumber
-uid=${}cat /proc/sys/kernel/random/uuid}
+uid=`cat /proc/sys/kernel/random/uuid`
 serialnumber="$(cut -d'-' -f5 <<<"$uid")"
 echo $serialnumber >> ~pi/.serialnumber
 echo "Serial Number: $serialnumber"
