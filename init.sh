@@ -63,17 +63,17 @@ apt-get install -y gpsd
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype1/config/gpsd
 
-runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam > /dev/null 2>&1" | crontab -'
-
-hostname boatcam.local
-
 #generate a uuid and save to ~/.serialnumber
-serialnumber=`/proc/sys/kernel/random/uuid`
+uid=${}cat /proc/sys/kernel/random/uuid}
+serialnumber="$(cut -d'-' -f5 <<<"$uid")"
 echo $serialnumber >> ~pi/.serialnumber
+echo "Serial Number: $serialnumber"
 
-API_KEY=$(curl -s --header "Content-Type: application/json" --header "x-api-key: $1"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber)
+curl -s --header "Content-Type: application/json" --header "x-api-key: $1"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber
 
 echo $API_KEY >> ~pi/.apikey
+
+runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam $API_KEY > /dev/null 2>&1" | crontab -'
 
 # enable camera
 echo "start_x=1" >> /boot/config.txt
