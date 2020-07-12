@@ -7,6 +7,7 @@ from BoatImage import BoatImage
 from Voltage import Voltages
 from Tide import Tide
 from Disk import Disk
+import json
 
 bucket_name = sys.argv[1]
 serialnumber = sys.argv[2]
@@ -33,6 +34,7 @@ disk_usage = Disk.current_usage()
 state = State(position, voltages, filename, x_angle, temperature, tide_height, disk_usage)
 state.save()
 
-uploader.upload_json()
+uploader.upload_boat_log(json.dumps(state))
+
 if filename is not None:
     uploader.upload_image(filename)
