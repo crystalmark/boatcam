@@ -38,7 +38,7 @@ class Uploader:
 
     def upload_boat_log(self, boat_log):
         try:
-            requests.put(BOATCAM_URL+self.serialnumber, headers=LOG_HEADERS, body=boat_log)
+            requests.put(BOATCAM_URL+self.serialnumber, headers=LOG_HEADERS, json=boat_log)
         except requests.exceptions.RequestException as e:
             logging.error(e)
             return False
