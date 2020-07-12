@@ -75,7 +75,7 @@ echo $API_KEY >> ~pi/.apikey
 curl -s --header "Content-Type: application/json" --header "x-api-key: $API_KEY"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber
 
 
-runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh boatcam $API_KEY > /dev/null 2>&1" | crontab -'
+runuser -l 'pi' -c 'echo "0 * * * * ~/boatcam/capture.sh $API_KEY > /dev/null 2>&1" | crontab -'
 
 # enable camera
 echo "start_x=1" >> /boot/config.txt

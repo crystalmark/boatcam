@@ -8,8 +8,7 @@ from Voltage import Voltages
 from Tide import Tide
 from Disk import Disk
 
-bucket_name = sys.argv[1]
-serialnumber = sys.argv[2]
+serialnumber = sys.argv[1]
 
 position = Position()
 position.fix()
@@ -26,13 +25,15 @@ temperature = gyro.get_temperature()
 tide = Tide()
 tide_height = tide.current_height()
 
-uploader = Uploader(bucket_name, serialnumber)
+uploader = Uploader(serialnumber)
 
 disk_usage = Disk.current_usage()
 
-state = State(position, voltages, filename, x_angle, temperature, tide_height, disk_usage)
+state = State(position, voltages, x_angle, temperature, tide_height, disk_usage)
 
+print(state.json())
 uploader.upload_boat_log(state.json())
 
+print( "Uploading "+filename)
 if filename is not None:
-    uploader.upload_image(filename)
+    uploader.upload_image(filename, position.timestamp)

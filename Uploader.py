@@ -1,7 +1,7 @@
-import logging
 import glob
 import os
 import requests
+import json
 
 API_KEY = 'kOcaoHBuT56svD7oyvEMm11PiFnQdN3L3oGFB8HL'
 
@@ -11,19 +11,17 @@ LOG_HEADERS = {'Content-Type' : 'application/json', 'x-api-key': API_KEY}
 
 
 class Uploader:
-    def __init__(self, bucket_name, serialnumber):
-        if bucket_name is not None:
-            self.bucket_name = bucket_name
-        else:
-            self.bucket_name = 'boatcam'
+    def __init__(self, serialnumber):
         self.serialnumber = serialnumber
 
-    def upload_image(self, file_name):
+    def upload_image(self, file_name, timestamp):
         try:
             files = {'media': open(file_name, 'rb')}
-            requests.post(BOATCAM_URL+self.serialnumber+'/images', headers=IMAGE_HEADERS, files=files)
+            image_url = BOATCAM_URL+self.serialnumber+'/images'
+            params = {'timestamp': timestamp}
+            requests.post(image_url, headers=IMAGE_HEADERS, files=files, params=params)
         except requests.exceptions.RequestException as e:
-            logging.error(e)
+            print(e)
             return False
         return True
 
@@ -38,8 +36,9 @@ class Uploader:
 
     def upload_boat_log(self, boat_log):
         try:
-            requests.put(BOATCAM_URL+self.serialnumber, headers=LOG_HEADERS, json=boat_log)
+            log_url = BOATCAM_URL+self.serialnumber
+            requests.put(log_url, headers=LOG_HEADERS, json=boat_log)
         except requests.exceptions.RequestException as e:
-            logging.error(e)
+            print(e)
             return False
         return True

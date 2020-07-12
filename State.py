@@ -3,10 +3,9 @@ import os
 
 
 class State:
-    def __init__(self, position, voltages, filename, x_angle, temperature, tide_height, disk_usage):
+    def __init__(self, position, voltages, x_angle, temperature, tide_height, disk_usage):
         self.position = position
         self.voltages = voltages
-        self.filename = filename
         self.x_angle = x_angle
         self.temperature = temperature
         self.tide_height = tide_height
@@ -16,7 +15,6 @@ class State:
         return {
             'timestamp': self.position.timestamp,
             'position': self.position.to_json(),
-            'filename': self.filename,
             'voltages': self.voltages,
             'x': str(self.x_angle),
             'temperature': self.temperature,

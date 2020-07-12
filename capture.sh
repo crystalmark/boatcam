@@ -1,6 +1,5 @@
 #!/bin/bash
-bucket=$1
-serialnumber=6b76c6b2-f05b-4ecf-a600-0fc87d3fdcd1
+serialnumber=$1
 cd ~/boatcam
 rm -f ./*.jpg
 [ ! -f test ] && git checkout .
