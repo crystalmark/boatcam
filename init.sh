@@ -54,7 +54,7 @@ runuser -l 'pi' -c 'cd boatcam; git checkout prototype2'
 
 pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1
 
-apt-get install -y libjpeg-dev
+apt-get install -y libjpeg-dev libtiff5 libopenjp2-7
 
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade Pillow
