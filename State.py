@@ -12,8 +12,8 @@ class State:
         self.tide_height = tide_height
         self.disk_usage = disk_usage
 
-    def save(self):
-        capture = {
+    def json(self):
+        return {
             'timestamp': self.position.timestamp,
             'position': self.position.to_json(),
             'filename': self.filename,
@@ -23,18 +23,6 @@ class State:
             'tide': self.tide_height,
             'disk': self.disk_usage
         }
-
-        if not os.path.exists('capture.json'):
-            capture_json = []
-            with open('capture.json', 'w') as capture_file:
-                json.dump(capture_json, capture_file, indent=4)
-        with open('capture.json', 'r+') as capture_file:
-            capture_json = json.load(capture_file)
-            if capture_json is None:
-                capture_json = []
-            capture_json.append(capture)
-            capture_file.seek(0)
-            json.dump(capture_json, capture_file, indent=4)
 
 
 
