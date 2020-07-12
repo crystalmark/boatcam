@@ -28,8 +28,6 @@ tide_height = tide.current_height()
 
 uploader = Uploader(bucket_name, serialnumber)
 
-uploader.download_json()
-
 disk_usage = Disk.current_usage()
 
 state = State(position, voltages, filename, x_angle, temperature, tide_height, disk_usage)
