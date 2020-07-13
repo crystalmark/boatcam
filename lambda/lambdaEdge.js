@@ -7,16 +7,19 @@ exports.handler = (event, context, callback) => {
     // Extract the URI from the request
     var olduri = request.uri;
 
-    // Match any '/' that occurs at the end of a URI. Replace it with a default index
-    var newuri = olduri.replace(/\/$/, '\/index.html');
-
     //ignore the serial number on the end of the path
     var serialNumberValidation=/^[0-9a-z]{12}$/;
-    var elements = newuri.split("/");
+    var elements = olduri.split("/");
     var last_element = elements.pop();
     if ( last_element.match(serialNumberValidation)) {
-        newuri = elements.join("/");
+        var newuri = elements.join("/")+"/index.html";
     }
+    else {
+        var newuri = olduri;
+    }
+
+    // Match any '/' that occurs at the end of a URI. Replace it with a default index
+    newuri = newuri.replace(/\/$/, '\/index.html');
 
     // Replace the received URI with the URI that includes the index page
     request.uri = newuri;
