@@ -1,9 +1,6 @@
 import boto3
 import botocore
 import json
-from datetime import datetime, timedelta
-import dateutil.parser
-import copy
 import os
 
 s3 = boto3.resource('s3')
