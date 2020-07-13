@@ -19,7 +19,7 @@ voltages = Voltages()
 voltages = voltages.read_voltages()
 
 gyro = Gyro()
-x_angle = gyro.get_x_degrees()
+angles = gyro.get_angles()
 temperature = gyro.get_temperature()
 
 tide = Tide()
@@ -29,7 +29,7 @@ uploader = Uploader(serialnumber)
 
 disk_usage = Disk.current_usage()
 
-state = State(position, voltages, x_angle, temperature, tide_height, disk_usage)
+state = State(position, voltages, angles, temperature, tide_height, disk_usage)
 
 print(state.json())
 uploader.upload_boat_log(state.json())

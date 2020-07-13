@@ -48,7 +48,7 @@ class Gyro:
             value = value - 65536
         return value
 
-    def get_x_degrees(self):
+    def get_angles(self):
         if self.bus is None:
             return None
         else:
@@ -140,7 +140,7 @@ class Gyro:
                     if (gyroYAngle < -180) or (gyroYAngle > 180):
                         gyroYAngle = kalAngleY
 
-                    return round(kalAngleX, 2);
+                    return {"pitch": round(kalAngleX), "roll": round(kalAngleY)}
 
                 except Exception as exc:
                     print(exc)
