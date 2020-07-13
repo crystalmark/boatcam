@@ -1,0 +1,110 @@
+<html>
+   <head>
+      <title>BoatCam</title>
+      <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+      <link rel="manifest" href="site.webmanifest">
+      <style>
+         .box {
+            width: 45%;
+            text-align: center;
+            margin: 20px 20px;
+            margin-bottom: 30px;
+            padding: 50px 15px;
+            background-color: #ffffff;
+            color: gray;
+            vertical-align: middle;
+            box-shadow: 5px 5px 20px;
+            float: left;
+            font-family: sans-serif;
+            height: 200px;
+           border-radius: 40px;
+        }
+
+         .smallbox {
+            width: 20%;
+         }
+
+         .widebox {
+            width: 100%;
+         }
+
+         .doubleheight {
+            height: 550px;
+         }
+
+         .title {
+            font-size: 2.5rem;
+         }
+      </style>
+      <link href="css/lightbox.min.css" rel="stylesheet" />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+         crossorigin=""/>
+      <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+         crossorigin=""></script>
+      <meta name="google-site-verification" content="osM8GKrX1f-YnTopDQubf_Pr52qC9i-UNt1XLJfGsgA" />
+   </head>
+   <body>
+      <div class="box doubleheight title">
+         <span id="date">XXXX</span>
+         <img src="" id="camera" style="width: 100%; border-radius: 40px; margin: 30px 0px;" data-lightbox="boatcam" style="margin-top: 50px;"/>
+      </div>
+      <div class="box smallbox">
+         <canvas id="enginevoltagecanvas" style="display: block; height: 200px; width: 100%;" class="chartjs-render-monitor"></canvas>
+      </div>
+      <div class="box smallbox">
+         <canvas id="leisurevoltagecanvas" style="display: block; height: 200px; width: 100%;" class="chartjs-render-monitor"></canvas>
+      </div>
+      <div class="box smallbox">
+         <img src="keel.png" id="keel" height="80%" />
+         <span id="tilt"></span>&nbsp;<span id="tiltdirection">unknown</span>
+      </div>
+      <div class="box smallbox" id="map"></div>
+      <div class="box">
+         <canvas id="voltagecanvas" style="display: block; height: 250px; width: 100%;"  class="chartjs-render-monitor"></canvas>
+      </div>
+      <div class="box">
+         <canvas id="tiltanglecanvas" style="display: block; height: 250px; width: 100%;" class="chartjs-render-monitor"></canvas>
+      </div>
+      <div class="box smallbox">
+         <script type="text/javascript">
+            var tt_border = '1px solid #000000';
+            var tt_bgnd   = '#ffffff';
+            var tt_width  = '100%';
+         </script>
+         <script src="https://www.tidetimes.org.uk/granton-tide-times.js" type="text/javascript"></script>
+      </div>
+      <div class="box doubleheight">
+         <iframe width="100%" height="450" style="margin-left: auto; margin-right: auto;" src="https://embed.windy.com/embed2.html?lat=55.942&lon=-3.203&zoom=11&level=surface&overlay=wind&menu=&message=&marker=true&calendar=24&pressure=true&type=map&location=coordinates&detail=true&detailLat=56.011&detailLon=-3.225&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1" frameborder="0"></iframe>
+      </div>
+      <div class="box smallbox" style="text-align: left;">
+         <p>
+            Device Serial Number <span id="serialnumber">unknown</span>
+         </p>
+         <p>
+            Commissioned on <span id="commissioned">unknown</span>m
+         </p>
+         <p>
+            Uptime <span id="uptime">unknown</span>m
+         </p>
+         <p>
+            Current Tide Height <span id="tide">unknown</span>m
+         </p>
+         <p>
+         Internal Device Temperature <span id="temperature">unknown</span>&deg;c
+         </p>
+         <p>
+            Internal Device Disk Use <span id="disk">unknown</span>&#37;
+         </p>
+      </div>
+
+
+      <script src="Chart.min.js"></script>   
+      <script type="text/javascript" src="webcam.js"></script>
+      <script src="js/chartjs-plugin-doughnutlabel.min.js"></script>
+      <script src="js/lightbox-plus-jquery.min.js"></script>
+   </body>
+</html>

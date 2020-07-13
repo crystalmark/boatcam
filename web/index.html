@@ -1,0 +1,119 @@
+<html>
+<head>
+    <title>BoatCam</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <style>
+         .box {
+            width: 45%;
+            text-align: center;
+            padding: 50px 15px;
+            background-color: #ffffff;
+            color: gray;
+            vertical-align: middle;
+            box-shadow: 5px 5px 20px;
+            font-family: sans-serif;
+            height: 200px;
+            overflow: auto;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              border-radius: 40px;
+            }
+
+         .title {
+            font-size: 1rem;
+         }
+
+         .h1 {
+            font-size: 1.2rem;
+         }
+
+         .subtext {
+            font-size: 0.8rem;
+         }
+
+         body {
+            text-align: center;
+         }
+
+         form {
+            margin:0px; padding:0px; display:inline;
+         }
+
+         button {
+            background-color: white;
+            border: 1px solid red;
+            line-height: 0;
+            font-size: 17px;
+            box-sizing: border-box;
+            padding: 20px 15px;
+            border-radius: 60px;
+            color: red;
+            font-weight: 100;
+            letter-spacing: 0.01em;
+            position: relative;
+            z-index: 1;
+        }
+
+        button:hover {
+            color: white;
+            background-color: red;
+        }
+
+        button:active {
+            color: white;
+            background-color: red;
+        }
+
+        input {
+              appearance: none;
+              background-color: none;
+              border: 1px solid red;
+              line-height: 0;
+              font-size: 17px;
+              width: 50%;
+              box-sizing: border-box;
+              padding: 10px 15px;
+              border-radius: 60px;
+              color: red;
+              font-weight: 100;
+              letter-spacing: 0.01em;
+              position: relative;
+              z-index: 1;
+        }
+
+        input:active {
+            color: white;
+            background-color: red;
+        }
+
+        input:hover {
+            color: white;
+            background-color: red;
+        }
+
+        input:focus {
+            color: white;
+            background-color: red;
+        }
+    </style>
+    <meta name="google-site-verification" content="osM8GKrX1f-YnTopDQubf_Pr52qC9i-UNt1XLJfGsgA"/>
+</head>
+<body>
+<div class="box title" style="margin: auto">
+    <h1>Device Serial Number</h1>
+    <form action="status/">
+        <input type="text" name="id"/>
+        <button type="submit"><span>Show Status</span></button>
+    </form>
+    <p class="subtext" style="margin-top: 25px;">Your device serial number is printed onto the outside of the BoatCam
+        box and on a card which came
+        with your BoatCam.</p>
+    <p class="subtext">It is 12 characters long and looks something like this: 1AB2CD3E45F6</p>
+</div>
+</body>
+</html>
