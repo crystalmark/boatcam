@@ -62,14 +62,17 @@ python3 -m pip install --upgrade Pillow
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/gpsd
 wget -O /etc/default/05c6:1000 https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/05c6:1000
+wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
 
 # enable camera
-echo "start_x=1" >> /boot/config.txt
-echo "gpu_mem=128" >> /boot/config.txt
-echo "disable_camera_led=1" >> /boot/config.txt
+if grep -q 'start_x=1' /boot/config.txt; then
+  echo 'Seems camera already active, skip this step.'
+else
+  echo 'start_x=1' >> /boot/config.txt
+  echo "gpu_mem=128" >> /boot/config.txt
+  echo "disable_camera_led=1" >> /boot/config.txt
+  echo "dtoverlay=disable-bt" >> /boot/config.txt
+fi
 
-echo "dtoverlay=disable-bt" >> /boot/config.txt
-
-wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
 
 
