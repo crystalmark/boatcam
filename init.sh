@@ -3,12 +3,12 @@
 #generate a uuid and save to ~/.serialnumber
 uid=`cat /proc/sys/kernel/random/uuid`
 serialnumber="$(cut -d'-' -f5 <<<"$uid")"
-echo $serialnumber >> ~pi/.serialnumber
+echo $serialnumber > ~pi/.serialnumber
 echo "Serial Number: $serialnumber"
 
 apikey=$1
 echo "Using $apikey:"
-echo $apikey >> ~pi/.apikey
+echo $apikey > ~pi/.apikey
 
 curl -s --header "Content-Type: application/json" --header "x-api-key: $apikey"  --request POST  https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/$serialnumber
 

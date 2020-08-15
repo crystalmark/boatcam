@@ -1,5 +1,6 @@
 from gps import *
 import time
+from datetime import datetime
 
 
 class Position:
@@ -19,7 +20,7 @@ class Position:
             if nx is not None and nx['class'] == 'TPV':
                 self.latitude = getattr(nx, 'lat', "Unknown")
                 self.longitude = getattr(nx, 'lon', "Unknown")
-                self.timestamp = getattr(nx, 'time', "Unknown")
+                self.timestamp = getattr(nx, 'time', datetime.today().isoformat())
                 break
             else:
                 count += 1

@@ -1,29 +1,25 @@
 import glob
 import os
 import requests
-import json
-
-API_KEY = 'kOcaoHBuT56svD7oyvEMm11PiFnQdN3L3oGFB8HL'
-
-BOATCAM_URL = 'https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/'
-IMAGE_HEADERS = {'Content-Type' : 'image/jpeg', 'x-api-key': API_KEY}
-LOG_HEADERS = {'Content-Type' : 'application/json', 'x-api-key': API_KEY}
 
 
 class Uploader:
-    def __init__(self, serialnumber):
-        self.serialnumber = serialnumber
+
+    def __init__(self, serialnumber, apikey):
+        self.image_headers = {'Content-Type': 'image/jpeg', 'x-api-key': apikey}
+        self.log_headers = {'Content-Type': 'application/json', 'x-api-key': apikey}
+        self.url = f"https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/{serialnumber}"
 
     def upload_image(self, file_name, timestamp):
         try:
-            files = {'media': open(file_name, 'rb')}
-            image_url = BOATCAM_URL+self.serialnumber+'/images'
+            image_url = f"{self.url}/images"
             params = {'timestamp': timestamp}
-            requests.post(image_url, headers=IMAGE_HEADERS, files=files, params=params)
+            # print(f"saving {file_name} to {image_url} with headers {self.image_headers}")
+            response = requests.post(image_url, headers=self.image_headers, data=open(file_name, 'rb').read(), params=params)
+            print(response)
         except requests.exceptions.RequestException as e:
             print(e)
-            return False
-        return True
+        return response
 
     def upload(self):
         self.upload_images()
@@ -36,8 +32,7 @@ class Uploader:
 
     def upload_boat_log(self, boat_log):
         try:
-            log_url = BOATCAM_URL+self.serialnumber
-            requests.put(log_url, headers=LOG_HEADERS, json=boat_log)
+            requests.put(f"{self.url}", headers=self.log_headers, json=boat_log)
         except requests.exceptions.RequestException as e:
             print(e)
             return False

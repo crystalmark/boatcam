@@ -37,33 +37,24 @@ fi
 
 apt-get update
 
-# install i2c-tools
-echo '>>> Install i2c-tools'
-if hash i2cget 2>/dev/null; then
-  echo 'Seems i2c-tools is installed already, skip this step.'
-else
-  apt-get install -y i2c-tools
-fi
-
-apt-get install -y git
-
-apt-get install -y python3 python3-pip
+apt-get install -y git i2c-tools python3 python3-pip libjpeg-dev libtiff5 libopenjp2-7 wvdial gpsd jq
 
 runuser -l 'pi' -c 'git clone https://github.com/crystalmark/boatcam.git'
 runuser -l 'pi' -c 'cd boatcam; git checkout prototype2'
+chmod a+x ~/boatcam/cmd/cmd.sh ~/boatcam/update.sh ~/boatcam/capture.sh
 
 python3 -m pip install --upgrade pip
 
-pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1
+pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1 uptime
 
-apt-get install -y libjpeg-dev libtiff5 libopenjp2-7 wvdial gpsd
 
 python3 -m pip install --upgrade Pillow
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/gpsd
-wget -O /etc/default/05c6:1000 https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/05c6:1000
+wget -O /etc/usb_modeswitch.d/05c6:1000 https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/05c6:1000
 wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
-
+wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
+#wget -O /etc/udev/rules.d/49-ublox.rules https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/49-ublox.rules
 # enable camera
 if grep -q 'start_x=1' /boot/config.txt; then
   echo 'Seems camera already active, skip this step.'

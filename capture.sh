@@ -1,17 +1,31 @@
 #!/bin/bash
 serialnumber=$1
-cd ~/boatcam
+apikey=$2
+. ~/.profile
+
+/bin/date
+
+if ! /usr/bin/pgrep -f wvdial &> /dev/null 2>&1; then
+#  sudo usb_modeswitch -R -v 0x05c6 -p 6000
+  sleep 5s
+  sudo /usr/bin/wvdial &
+  sleep 30s
+else
+  echo wvdial is already running
+fi
+cd ~pi/boatcam
 rm -f ./*.jpg
-[ ! -f test ] && git checkout .
-[ ! -f test ] && git pull 2>&1
-rm -rf __pycache__
 i=0
-until python3 capture.py $bucket $serialnumber 2>&1 ; do
+until python3 capture.py $serialnumber $apikey 2>&1 ; do
   ((i = i + 1))
-  [[ i -ge 3 ]] && echo "Failed!" && break
+  [[ i -ge 3 ]] && echo "Failed more than 3 times!" && break
   sleep 30
-  [ ! -f test ] && git pull 2>&1
-  [ ! -f test ] && rm -rf __pycache__
+  if ! /usr/bin/pgrep -f wvdial &> /dev/null 2>&1; then
+#    sudo usb_modeswitch -R -v 0x05c6 -p 6000
+    sleep 5s
+    sudo /usr/bin/wvdial &
+    sleep 30s
+  fi
 done
-#[ ! -f test ] && ~/.local/bin/aws s3 cp /var/mail/pi "s3://$bucket/pi_mail"
-#[ ! -f test ] && cat /dev/null > /var/mail/pi
+sleep 20s
+sudo killall wvdial
