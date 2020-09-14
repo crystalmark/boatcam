@@ -31,13 +31,12 @@ function getSerialNumber() {
     return window.location.pathname.split("/").pop()
 }
 
-readTextFile("https://boatcam.s3.eu-west-2.amazonaws.com/capture.json", function(text){
+readTextFile("https://boatcam.io/status/"+getSerialNumber()+"/log", function(text){
     var DEFAULT_COLORS1 = ['#f08700', '#f49f0a', '#efca08', '#00a6a6', '#bbdef0'];
     var DEFAULT_COLORS2 = ['#7fb7be', '#357266', '#dacc3e', '#bc2c1a', '#7d1538'];
 
     var data = JSON.parse(text);
     var l = data.length-1;
-    var filename = data[l].filename;
     var date = new Date(data[l].timestamp);
     var leisure_voltage = data[l].voltages.voltage1;
     var engine_voltage = data[l].voltages.voltage2;
@@ -49,8 +48,8 @@ readTextFile("https://boatcam.s3.eu-west-2.amazonaws.com/capture.json", function
     var temperature = data[l].temperature
     var disk_useage = data[l].disk.percent_used
 
-    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    document.getElementById("camera").src = "https://boatcam.s3.eu-west-2.amazonaws.com/"+encodeURI(filename)
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }
+    document.getElementById("camera").src = "https://whqprggu22.execute-api.eu-west-2.amazonaws.com/beta/boatcam/"+getSerialNumber()+"/images/"+data[l].timestamp
     document.getElementById("date").innerHTML = date.toLocaleDateString("en-GB", options)
     document.getElementById("keel").style.transform = 'rotate(' + Math.round(tilt) + 'deg)'
     document.getElementById("tilt").innerHTML = Math.abs(Math.round(tilt))

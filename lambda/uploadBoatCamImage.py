@@ -13,6 +13,7 @@ def lambda_handler(event, context):
         serial_number = event["params"]["path"]["serialnumber"]
         timestamp = event["params"]["querystring"]["timestamp"]
         file_content = base64.b64decode(event['content'])
+
         content_object = s3.Object(os.environ['bucketName'], serial_number + '/' + timestamp + '.jpg')
         content_object.put(Body=file_content)
 
@@ -27,11 +28,10 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "headers": {'Access-Control-Allow-Origin': '*'},
-            "body": json.dumps(event)
+            "body": stack
         }
 
     return {
         "statusCode": 403,
         "headers": {'Access-Control-Allow-Origin': '*'}
     }
-

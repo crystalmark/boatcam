@@ -6,11 +6,11 @@ import dateutil.parser
 import copy
 import os
 
-MAX_LOG_AGE=7
 s3 = boto3.resource('s3')
 
 
 def lambda_handler(event, context):
+    print(json.dumps(event))
     serial_number = event["pathParameters"]["serialnumber"]
     update = json.loads(event["body"])
 
@@ -26,13 +26,14 @@ def lambda_handler(event, context):
             try:
                 log_date = dateutil.parser.parse(log["timestamp"])
                 now = datetime.now(log_date.tzinfo)
-                log_age_limit = now - timedelta(days=MAX_LOG_AGE)
+                log_age_limit = now - timedelta(days=14)
                 datetime.now(log_date.tzinfo)
                 if log_date > log_age_limit:
                     updated_boat_log["logs"].append(log)
-            except KeyError:
-                print("Ignoring log entry since it has not timestamp ")
+            except Exception as e:
+                print("Ignoring log entry since it has no timestamp")
                 print(log)
+                print(e)
 
         updated_boat_log["logs"].append(update)
 

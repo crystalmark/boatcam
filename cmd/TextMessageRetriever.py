@@ -3,7 +3,7 @@ import time
 import re
 
 SERVICE_PROVIDERS = [
-    # ['23410', '+447802002606', 'GiffGaff'],
+    ['23410', '+447802002606', 'GiffGaff'],
     ['23410', '+447802000332', 'O2'],
     ['23430', '+447958879879', 'EE'],
     ['23431', '+447958879879', 'EE'],
@@ -33,6 +33,7 @@ class TextMessageRetriever:
         self.log(str(id))
         for supplier in SERVICE_PROVIDERS:
             if id[0].startswith(f"+CIMI:{supplier[0]}"):
+                self.log(f"Using service provider {supplier[2]}")
                 return supplier[1]
         return None
 
