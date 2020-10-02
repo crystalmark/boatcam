@@ -32,6 +32,35 @@ function secondsToDhms(seconds) {
     return dDisplay + hDisplay + mDisplay;
 }
 
+Date.prototype.addDays = function(days) {
+   var dat = new Date(this.valueOf())
+   dat.setDate(dat.getDate() + days);
+   return dat;
+}
+
+Date.prototype.addHours = function(h) {
+  this.setTime(this.getTime() + (h*60*60*1000));
+  return this;
+}
+
+function getDates(startDate, stopDate) {
+    var dateArray = [];
+    var currentDate = startDate;
+    while (currentDate <= stopDate) {
+        currentDate = new Date(currentDate.getTime());
+        currentDate = currentDate.addHours(1);
+        console.log(currentDate)
+        dateArray.push(currentDate)
+    }
+    return dateArray;
+}
+
+function weekOfHours(){
+    var now = new Date()
+    now.setMinutes(0, 0);
+    return = getDates(now, now.addDays(2));
+}
+
 function portOrStarboard(tilt){
   if ( tilt == 0 ) {
     return "level";

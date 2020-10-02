@@ -65,5 +65,5 @@ else
   echo "dtoverlay=disable-bt" >> /boot/config.txt
 fi
 
-
+chmod 4754 /usr/sbin/pppd
 

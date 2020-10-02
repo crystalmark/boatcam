@@ -3,14 +3,11 @@ import time
 import re
 
 SERVICE_PROVIDERS = [
-    ['23410', '+447802002606', 'GiffGaff'],
-    ['23410', '+447802000332', 'O2'],
-    ['23430', '+447958879879', 'EE'],
-    ['23431', '+447958879879', 'EE'],
-    ['23432', '+447958879879', 'EE'],
-    ['23415', '+447785014208', 'Vodaphone'],
-    ['234', '+', ''],
-
+#    MCC+MNC, CSCA,            init1, init2,                               init3,                              username,   password,    name
+    ['23410', '+447802002606', 'ATZ', 'ATQ0 V1 E1 S0=0 &C1 &D2 +FCLASS=0', 'AT+CGDCONT=1,"IP","giffgaff.com"', 'giffgaff', 'password', 'GiffGaff'],
+    ['23430', '+447958879879', 'ATZ', 'ATQ0 V1 E1 S0=0 &C1 &D2 +FCLASS=0', 'AT+CGDCONT=1,"IP","everywhere"',   None,       None,        'EE'],
+    ['23431', '+447958879879', 'ATZ', 'ATQ0 V1 E1 S0=0 &C1 &D2 +FCLASS=0', 'AT+CGDCONT=1,"IP","everywhere"',   None,       None,        'EE'],
+    ['23432', '+447958879879', 'ATZ', 'ATQ0 V1 E1 S0=0 &C1 &D2 +FCLASS=0', 'AT+CGDCONT=1,"IP","everywhere"',   None,       None,        'EE']
 ]
 
 
@@ -30,10 +27,10 @@ class TextMessageRetriever:
 
     def get_CSCA_number(self):
         id = self.write('AT+CIMI')
-        self.log(str(id))
+        self.log(f"Looking for CSCA number in {str(id)}")
         for supplier in SERVICE_PROVIDERS:
             if id[0].startswith(f"+CIMI:{supplier[0]}"):
-                self.log(f"Using service provider {supplier[2]}")
+                self.log(f"Using service provider {supplier[7]}")
                 return supplier[1]
         return None
 
@@ -42,15 +39,17 @@ class TextMessageRetriever:
         self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=5)
         time.sleep(0.5)
         self.ser = self.reset_modem()
-        id = self.write('AT+CREG?')
-        self.log(str(id))
+        self.log(str(self.write('AT+CLAC?')))
+        self.log(str(self.write('AT+CREG=1')))
+        self.log(str(self.write('AT+CREG?')))
         self.write('AT+CSCA="' + self.get_CSCA_number() + '"')
 
-    def write(self, message, wait=0.1):
+    def write(self, message, wait=1):
         if self.ser is None:
             self.connect_phone()
         self.log(message)
         m = message + '\r\n'
+        self.log(f"clearing responses: {self.read()}")
         self.ser.write(m.encode())
         time.sleep(wait)
         return self.read()
@@ -85,6 +84,8 @@ class TextMessageRetriever:
 
     def get_mems(self):
         a = self.write('AT+CIND=?')
+        self.log(a)
+        a = self.write('AT+CIND?')
         self.log(a)
         output = self.write('AT+CPMS=?')
         if len(output) == 2 and output[1] == 'OK':
@@ -144,12 +145,18 @@ class TextMessageRetriever:
     def reset_modem(self):
         i = 0
         while i < 5:
-            reply = self.write('ATZ')
-            if len(reply) > 0 and reply[0] == 'OK':
+            replies = self.write('ATZ')
+            if self.match_reply(replies, 'OK'):
                 return self.ser
             else:
-                self.log(f"unable to reset modem, sleeping for {i + 2} ({reply})")
+                self.log(f"unable to reset modem, sleeping for {i + 2} ({replies})")
                 time.sleep(2 + i)
                 i = i + 1
         self.log("unable to reset modem, giving up")
         raise ConnectionError("unable to reset modem, giving up")
+
+    def match_reply(self, replies, message):
+        for reply in replies:
+            if reply == message:
+                return True
+        return False
