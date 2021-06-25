@@ -52,8 +52,8 @@ python3 -m pip install --upgrade Pillow
 
 wget -O /etc/default/gpsd https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/gpsd
 wget -O /etc/usb_modeswitch.d/05c6:1000 https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/05c6:1000
-wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
-wget -O /etc/wvdial.conf https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf
+wget -O /etc/wvdial.conf.giffgaff https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf.giffgaff
+wget -O /etc/wvdial.conf.ee https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/wvdial.conf.ee
 #wget -O /etc/udev/rules.d/49-ublox.rules https://raw.githubusercontent.com/crystalmark/boatcam/prototype2/config/49-ublox.rules
 # enable camera
 if grep -q 'start_x=1' /boot/config.txt; then
