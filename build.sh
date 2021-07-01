@@ -45,7 +45,7 @@ chmod a+x ~/boatcam/cmd/cmd.sh ~/boatcam/update.sh ~/boatcam/capture.sh
 
 python3 -m pip install --upgrade pip
 
-pip3 install smbus boto3 gps picamera piexif board adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1 uptime
+pip3 install smbus boto3 gps picamera piexif adafruit_blinka adafruit-circuitpython-ina219 adafruit-circuitpython-lsm9ds1 uptime
 
 
 python3 -m pip install --upgrade Pillow
